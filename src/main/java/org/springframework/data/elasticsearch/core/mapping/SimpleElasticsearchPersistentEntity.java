@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Dynamic;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.Routing;
@@ -73,6 +74,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 	private @Nullable ElasticsearchPersistentProperty joinFieldProperty;
 	private @Nullable VersionType versionType;
 	private boolean createIndexAndMapping;
+	private Dynamic dynamic = Dynamic.INHERIT;
 	private final Map<String, ElasticsearchPersistentProperty> fieldNamePropertyCache = new ConcurrentHashMap<>();
 	private final ConcurrentHashMap<String, Expression> routingExpressions = new ConcurrentHashMap<>();
 	private @Nullable String routing;
@@ -102,6 +104,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 			this.indexName = document.indexName();
 			this.versionType = document.versionType();
 			this.createIndexAndMapping = document.createIndex();
+			this.dynamic = document.dynamic();
 		}
 
 		Routing routingAnnotation = AnnotatedElementUtils.findMergedAnnotation(clazz, Routing.class);
@@ -558,5 +561,10 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 		public FieldNamingStrategy getFieldNamingStrategy() {
 			return fieldNamingStrategy;
 		}
+	}
+
+	@Override
+	public Dynamic dynamic() {
+		return dynamic;
 	}
 }

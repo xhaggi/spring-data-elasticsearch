@@ -197,7 +197,12 @@ public class MappingBuilder {
 			}
 		}
 
-		if (dynamicMapping != null) {
+		if (isRootObject && entity != null && entity.dynamic() != Dynamic.INHERIT) {
+			builder.field(TYPE_DYNAMIC, entity.dynamic().name().toLowerCase());
+		} else if (nestedOrObjectField && parentFieldAnnotation != null
+				&& parentFieldAnnotation.dynamic() != Dynamic.INHERIT) {
+			builder.field(TYPE_DYNAMIC, parentFieldAnnotation.dynamic().name().toLowerCase());
+		} else if (dynamicMapping != null) {
 			builder.field(TYPE_DYNAMIC, dynamicMapping.value().name().toLowerCase());
 		}
 
@@ -440,8 +445,12 @@ public class MappingBuilder {
 
 		builder.startObject(property.getFieldName());
 
-		if (nestedOrObjectField && dynamicMapping != null) {
-			builder.field(TYPE_DYNAMIC, dynamicMapping.value().name().toLowerCase());
+		if (nestedOrObjectField) {
+			if (annotation.dynamic() != Dynamic.INHERIT) {
+				builder.field(TYPE_DYNAMIC, annotation.dynamic().name().toLowerCase());
+			} else if (dynamicMapping != null) {
+				builder.field(TYPE_DYNAMIC, dynamicMapping.value().name().toLowerCase());
+			}
 		}
 
 		addFieldMappingParameters(builder, annotation, nestedOrObjectField);
@@ -489,8 +498,12 @@ public class MappingBuilder {
 		// main field
 		builder.startObject(property.getFieldName());
 
-		if (nestedOrObjectField && dynamicMapping != null) {
-			builder.field(TYPE_DYNAMIC, dynamicMapping.value().name().toLowerCase());
+		if (nestedOrObjectField) {
+			if (annotation.mainField().dynamic() != Dynamic.INHERIT) {
+				builder.field(TYPE_DYNAMIC, annotation.mainField().dynamic().name().toLowerCase());
+			} else if (dynamicMapping != null) {
+				builder.field(TYPE_DYNAMIC, dynamicMapping.value().name().toLowerCase());
+			}
 		}
 
 		addFieldMappingParameters(builder, annotation.mainField(), nestedOrObjectField);
